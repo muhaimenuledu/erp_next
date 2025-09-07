@@ -46,14 +46,19 @@ frappe.listview_settings['Test001'] = {
                         }
 
                         // Build table rows
-                        let rows = r.message.map(d => `
-                            <tr>
-                                <td>${d.name}</td>
-                                <td>${d.asset_name || ""}</td>
-                                <td>${d.asset_category || ""}</td>
-                                <td>${d.asset_category ? (category_gl_map[d.asset_category] || "") : ""}</td>
-                            </tr>
-                        `).join("");
+                        let rows = r.message.map(d => {
+                            let account = d.asset_category ? (category_gl_map[d.asset_category] || "") : "";
+                            let prefix = account ? account.substring(0, 2) : "";
+                            return `
+                                <tr>
+                                    <td>${d.name}</td>
+                                    <td>${d.asset_name || ""}</td>
+                                    <td>${d.asset_category || ""}</td>
+                                    <td>${account}</td>
+                                    <td>${prefix}</td>
+                                </tr>
+                            `;
+                        }).join("");
 
                         listview.page.wrapper.find('#asset_rows').append(rows);
                         listview.page.wrapper.find('#show_more_btn').show();
@@ -61,7 +66,7 @@ frappe.listview_settings['Test001'] = {
                         listview.page.wrapper.find('#show_more_btn').hide();
                         if (reset) {
                             listview.page.wrapper.find('#asset_rows').append(
-                                `<tr><td colspan="4" class="text-center text-muted">No Assets Found</td></tr>`
+                                `<tr><td colspan="5" class="text-center text-muted">No Assets Found</td></tr>`
                             );
                         }
                     }
@@ -80,6 +85,7 @@ frappe.listview_settings['Test001'] = {
                                 <th>Asset Name</th>
                                 <th>Asset Category</th>
                                 <th>Fixed Asset Account</th>
+                                <th>Account Prefix</th>
                             </tr>
                         </thead>
                         <tbody id="asset_rows"></tbody>
